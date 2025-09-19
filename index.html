@@ -1,0 +1,2604 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>C++ Programming Exam</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+    <style>
+      :root {
+        --bg-dark: #1a1a2e;
+        --container-dark: #16213e;
+        --primary-accent: #0f3460;
+        --primary-hover: #537895;
+        --text-light: #e3e3e3;
+        --text-dark: #a9a9a9;
+        --success-green: #28a745;
+        --danger-red: #dc3545;
+        --light-green: rgba(40, 167, 69, 0.15);
+        --light-red: rgba(220, 53, 69, 0.15);
+        --border-color: #3a3a5a;
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: "Poppins", sans-serif;
+        background-image: linear-gradient(
+          to top,
+          #1a1a2e,
+          #1f213b,
+          #252848,
+          #2c2f56,
+          #333664
+        );
+        color: var(--text-light);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .main-container {
+        width: 100%;
+        max-width: 800px;
+        background: var(--container-dark);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        padding: 30px 40px;
+        text-align: center;
+        border: 1px solid var(--border-color);
+      }
+
+      h1 {
+        color: white;
+        margin-bottom: 10px;
+        font-weight: 700;
+      }
+      .main-container > p {
+        color: var(--text-dark);
+        margin-bottom: 30px;
+      }
+
+      /* Views */
+      #user-details-container,
+      #part-selection-container,
+      #quiz-container,
+      #summary-container {
+        display: none; /* Hide all views initially */
+      }
+
+      /* User Details Form */
+      #user-details-container {
+        display: block;
+      }
+      .form-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: var(--text-dark);
+      }
+      .form-group input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        background-color: var(--bg-dark);
+        color: var(--text-light);
+        border-radius: 8px;
+        font-size: 1em;
+        transition: border-color 0.3s, box-shadow 0.3s;
+      }
+      .form-group input:focus {
+        outline: none;
+        border-color: var(--primary-hover);
+        box-shadow: 0 0 0 3px rgba(83, 120, 149, 0.3);
+      }
+
+      .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background-color: var(--primary-accent);
+        color: white;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      .btn:hover {
+        background-color: var(--primary-hover);
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+      #start-error {
+        color: var(--danger-red);
+        margin-top: 15px;
+        font-weight: 500;
+      }
+
+      /* Part Selection */
+      .part-buttons {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+      }
+
+      /* Quiz Styling */
+      .question-block {
+        margin-bottom: 25px;
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 20px;
+        text-align: left;
+      }
+      .question-text {
+        font-size: 1.15em;
+        font-weight: 500;
+        margin-bottom: 15px;
+        line-height: 1.6;
+      }
+      pre {
+        background-color: #0d1117;
+        padding: 15px;
+        border-radius: 5px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: "Fira Code", "Courier New", Courier, monospace;
+        border: 1px solid var(--border-color);
+        color: #c9d1d9;
+      }
+      .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .option {
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        text-align: left;
+        width: 100%;
+        font-size: 1em;
+        background-color: transparent;
+        color: var(--text-light);
+      }
+      .option:not(:disabled):hover {
+        background-color: rgba(255, 255, 255, 0.05);
+        border-color: var(--primary-hover);
+        transform: translateX(5px);
+      }
+      .option.correct {
+        background-color: var(--light-green);
+        border-color: var(--success-green);
+        color: #fff;
+        font-weight: 600;
+      }
+      .option.incorrect {
+        background-color: var(--light-red);
+        border-color: var(--danger-red);
+        color: #fff;
+        font-weight: 600;
+      }
+      .explanation {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        background-color: rgba(0, 0, 0, 0.2);
+        border-left: 5px solid var(--primary-accent);
+        display: none;
+        text-align: left;
+        color: var(--text-dark);
+        line-height: 1.7;
+      }
+
+      /* Quiz Header & Progress Bar */
+      #quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--border-color);
+      }
+      #quiz-header h2 {
+        margin: 0;
+      }
+      #timer {
+        font-size: 1.1em;
+        font-weight: 600;
+        background-color: var(--primary-accent);
+        padding: 5px 15px;
+        border-radius: 20px;
+      }
+      #progress-container {
+        width: 100%;
+        background-color: var(--bg-dark);
+        border-radius: 10px;
+        margin-bottom: 20px;
+        border: 1px solid var(--border-color);
+      }
+      #progress-bar {
+        width: 0%;
+        height: 12px;
+        background-color: var(--primary-hover);
+        border-radius: 10px;
+        transition: width 0.5s ease;
+      }
+      #progress-text {
+        font-size: 1em;
+        font-weight: 500;
+        margin-top: 5px;
+      }
+
+      /* Summary */
+      #summary-container h2 {
+        color: var(--success-green);
+      }
+      #summary-text {
+        font-size: 1.2em;
+        line-height: 1.8;
+        margin: 20px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main-container">
+      <div id="user-details-container">
+        <h1>C++ Programming Exam</h1>
+        <p>Enter your details to embark on the challenge.</p>
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" placeholder="e.g., Cindrella" />
+        </div>
+        <div class="form-group">
+          <label for="mobile">Mobile Number</label>
+          <input
+            type="tel"
+            id="mobile"
+            placeholder="Enter your 10-digit mobile number"
+          />
+        </div>
+        <button id="start-btn" class="btn">Start Exam</button>
+        <p id="start-error" style="display: none"></p>
+      </div>
+
+      <div id="part-selection-container">
+        <h2 id="welcome-message"></h2>
+        <p>Please select a part to begin the test.</p>
+        <div class="part-buttons">
+          <button class="btn part-btn" data-part="1">Part 1 (Q 1-50)</button>
+          <button class="btn part-btn" data-part="2">Part 2 (Q 51-100)</button>
+          <button class="btn part-btn" data-part="3">Part 3 (Q 101-150)</button>
+          <button class="btn part-btn" data-part="4">Part 4 (Q 151-200)</button>
+        </div>
+      </div>
+
+      <div id="quiz-container">
+        <div id="quiz-header">
+          <h2 id="quiz-title"></h2>
+          <span id="timer">15:00</span>
+        </div>
+        <div id="progress-container">
+          <div id="progress-bar"></div>
+        </div>
+        <div id="progress-text">Answered: 0 / 50</div>
+
+        <div id="quiz" style="margin-top: 20px"></div>
+        <button
+          id="show-score-btn"
+          class="btn"
+          style="display: none; margin-top: 20px"
+        >
+          Show My Score
+        </button>
+      </div>
+
+      <div id="summary-container">
+        <h2>Part Complete!</h2>
+        <p id="summary-text"></p>
+        <button id="back-to-parts-btn" class="btn">Choose Another Part</button>
+      </div>
+    </div>
+
+    <script>
+      // DOM Elements
+      const allViews = {
+        details: document.getElementById("user-details-container"),
+        parts: document.getElementById("part-selection-container"),
+        quiz: document.getElementById("quiz-container"),
+        summary: document.getElementById("summary-container"),
+      };
+
+      // State variables
+      let currentUser = { name: "" };
+      let currentPartData = [];
+      let currentScore = 0;
+      let answeredQuestions = 0;
+      let currentPartNumber = 0;
+
+      // Timer variables
+      let timerInterval;
+      const PART_DURATION_SECONDS = 20 * 60; // 20 minutes per part
+
+      const quizData = [
+        // Part 1: Q1-50
+        {
+          part: 1,
+          question: "Q1. Which of the following is not a feature of C++?",
+          options: [
+            "a) Encapsulation",
+            "b) Garbage Collection",
+            "c) Operator Overloading",
+            "d) Inheritance",
+          ],
+          correct: "b",
+          explanation:
+            "C++ does not have built-in automatic garbage collection like Java or C#. Memory management is done manually by the programmer using `new` and `delete`.",
+        },
+        {
+          part: 1,
+          question:
+            "Q2. Which keyword is used to define a constant variable in C++17?",
+          options: ["a) const", "b) static", "c) define", "d) constant"],
+          correct: "a",
+          explanation:
+            "The `const` keyword is used to declare a variable whose value cannot be changed after initialization. `constexpr` is also used for compile-time constants.",
+        },
+        {
+          part: 1,
+          question: "Q3. Which operator cannot be overloaded in C++?",
+          options: ["a) +", "b) ?:", "c) []", "d) ()"],
+          correct: "b",
+          explanation:
+            "The conditional (ternary) operator `?:`, along with scope resolution `::`, member access `.` and `.*`, and `sizeof`, cannot be overloaded.",
+        },
+        {
+          part: 1,
+          question:
+            "Q4. The default access specifier for class members in C++ is:",
+          options: ["a) public", "b) private", "c) protected", "d) friend"],
+          correct: "b",
+          explanation:
+            "If no access specifier is provided for members of a class, they are `private` by default. For `struct`, the default is `public`.",
+        },
+        {
+          part: 1,
+          question: "Q5. C++ was developed by:",
+          options: [
+            "a) James Gosling",
+            "b) Bjarne Stroustrup",
+            "c) Dennis Ritchie",
+            "d) Guido van Rossum",
+          ],
+          correct: "b",
+          explanation:
+            "Bjarne Stroustrup developed C++ at Bell Labs starting in 1979 as an extension of the C language.",
+        },
+        {
+          part: 1,
+          question:
+            "Q6. Which of the following best describes inline functions?",
+          options: [
+            "a) Defined in header files only",
+            "b) Reduce function call overhead",
+            "c) Always compiled at runtime",
+            "d) Used only with constructors",
+          ],
+          correct: "b",
+          explanation:
+            "The `inline` keyword is a request to the compiler to replace the function call with the function's body, thus avoiding the overhead of a function call.",
+        },
+        {
+          part: 1,
+          question:
+            "Q7. Which operator is used to allocate memory dynamically in C++?",
+          options: ["a) malloc()", "b) calloc()", "c) new", "d) alloc()"],
+          correct: "c",
+          explanation:
+            "The `new` operator is the C++ way to allocate memory on the heap. It also calls the constructor for objects. `malloc()` is from C.",
+        },
+        {
+          part: 1,
+          question: "Q8. The delete operator in C++:",
+          options: [
+            "a) Frees memory allocated by malloc()",
+            "b) Frees memory allocated by new",
+            "c) Can only delete arrays",
+            "d) Works like free() in C",
+          ],
+          correct: "b",
+          explanation:
+            "The `delete` operator is used to deallocate memory that was allocated with `new`. It also calls the destructor for objects.",
+        },
+        {
+          part: 1,
+          question: "Q9. Which of the following is not an OOP concept?",
+          options: [
+            "a) Abstraction",
+            "b) Encapsulation",
+            "c) Polymorphism",
+            "d) Compilation",
+          ],
+          correct: "d",
+          explanation:
+            "Compilation is the process of converting source code to machine code. Abstraction, Encapsulation, and Polymorphism are fundamental principles of Object-Oriented Programming (OOP).",
+        },
+        {
+          part: 1,
+          question: "Q10. A copy constructor takes parameter as:",
+          options: [
+            "a) Constant reference",
+            "b) Pointer",
+            "c) Double reference",
+            "d) Value",
+          ],
+          correct: "a",
+          explanation:
+            "A copy constructor typically takes a constant reference to an object of the same class, e.g., `ClassName(const ClassName& other);`. This prevents infinite recursion and modification of the source object.",
+        },
+        {
+          part: 1,
+          question:
+            "Q11. Which type of inheritance causes the 'diamond problem'?",
+          options: [
+            "a) Single",
+            "b) Multiple",
+            "c) Multilevel",
+            "d) Hierarchical",
+          ],
+          correct: "b",
+          explanation:
+            "The diamond problem occurs when a class inherits from two classes that both inherit from the same base class. This ambiguity is resolved in C++ using virtual inheritance.",
+        },
+        {
+          part: 1,
+          question:
+            "Q12. Which keyword makes a base class method overridable at runtime?",
+          options: ["a) static", "b) friend", "c) virtual", "d) override"],
+          correct: "c",
+          explanation:
+            "The `virtual` keyword enables dynamic dispatch (runtime polymorphism), allowing a derived class to provide its own implementation of a base class method.",
+        },
+        {
+          part: 1,
+          question: "Q13. A pure virtual function is defined by:",
+          options: [
+            "a) virtual void f() {};",
+            "b) virtual void f() = 0;",
+            "c) void f() = 0;",
+            "d) virtual f();",
+          ],
+          correct: "b",
+          explanation:
+            "A pure virtual function is declared by assigning `= 0`. A class containing at least one pure virtual function becomes an abstract class.",
+        },
+        {
+          part: 1,
+          question: "Q14. Which cast is considered the most dangerous in C++?",
+          options: [
+            "a) static_cast",
+            "b) const_cast",
+            "c) reinterpret_cast",
+            "d) dynamic_cast",
+          ],
+          correct: "c",
+          explanation:
+            "`reinterpret_cast` can convert any pointer type to any other pointer type, even unrelated ones, without any safety checks. It is highly platform-dependent and should be used with extreme caution.",
+        },
+        {
+          part: 1,
+          question: "Q15. Exception handling in C++ uses which blocks?",
+          options: [
+            "a) try, catch, throw",
+            "b) do, catch, throw",
+            "c) try, throw, finally",
+            "d) error, catch, throw",
+          ],
+          correct: "a",
+          explanation:
+            "C++ uses the `try` block to enclose code that might raise an exception, `throw` to signal an exception, and `catch` to handle it. C++ does not have a `finally` block like some other languages.",
+        },
+        {
+          part: 1,
+          question: "Q16. cin and cout are objects of which classes?",
+          options: [
+            "a) istream & ostream",
+            "b) iostream & fstream",
+            "c) ifstream & ofstream",
+            "d) ios & ostringstream",
+          ],
+          correct: "a",
+          explanation:
+            "`cin` is an object of the `istream` class (input stream), and `cout` is an object of the `ostream` class (output stream).",
+        },
+        {
+          part: 1,
+          question: "Q17. Which manipulator sets width in output formatting?",
+          options: [
+            "a) setw()",
+            "b) setprecision()",
+            "c) width()",
+            "d) setbase()",
+          ],
+          correct: "a",
+          explanation:
+            "The `setw()` manipulator, found in the `<iomanip>` header, is used to set the minimum field width for the next output operation.",
+        },
+        {
+          part: 1,
+          question: "Q18. To write data into a file in C++ we use:",
+          options: [
+            "a) ifstream",
+            "b) ofstream",
+            "c) fstream with ios::in",
+            "d) iomanip",
+          ],
+          correct: "b",
+          explanation:
+            "`ofstream` (output file stream) is the class used for writing to files. `ifstream` is for reading, and `fstream` can be used for both.",
+        },
+        {
+          part: 1,
+          question: "Q19. Templates in C++ provide:",
+          options: [
+            "a) Run-time polymorphism",
+            "b) Compile-time polymorphism",
+            "c) Dynamic memory allocation",
+            "d) Namespace handling",
+          ],
+          correct: "b",
+          explanation:
+            "Templates allow writing generic code that works with different data types. The compiler generates the specific code for each type at compile-time, which is a form of compile-time polymorphism.",
+        },
+        {
+          part: 1,
+          question:
+            "Q20. Which STL container stores unique elements in key-value form?",
+          options: ["a) Vector", "b) Stack", "c) Map", "d) Queue"],
+          correct: "c",
+          explanation:
+            "`std::map` is an associative container that stores elements in a mapped fashion, where each element has a key and a mapped value. Keys are unique.",
+        },
+        {
+          part: 1,
+          question: "Q21. What is the size of a pointer on a 64-bit machine?",
+          options: [
+            "a) 2 bytes",
+            "b) 4 bytes",
+            "c) 8 bytes",
+            "d) Depends on compiler",
+          ],
+          correct: "c",
+          explanation:
+            "A pointer stores a memory address. On a 64-bit architecture, memory addresses are 64 bits long, which is 8 bytes.",
+        },
+        {
+          part: 1,
+          question:
+            "Q22. Which keyword is used to refer to the current object in C++?",
+          options: ["a) self", "b) this", "c) obj", "d) current"],
+          correct: "b",
+          explanation:
+            "The `this` keyword is a pointer that holds the memory address of the current object within a member function.",
+        },
+        {
+          part: 1,
+          question: "Q23. Default constructor is called when:",
+          options: [
+            "a) No arguments are passed while creating object",
+            "b) Object is copied",
+            "c) Object is deleted",
+            "d) Object is typecasted",
+          ],
+          correct: "a",
+          explanation:
+            "The default constructor is the constructor that is called when an object is created without any arguments.",
+        },
+        {
+          part: 1,
+          question: "Q24. Which type of function cannot be virtual?",
+          options: [
+            "a) Destructor",
+            "b) Static function",
+            "c) Member function",
+            "d) Friend function",
+          ],
+          correct: "b",
+          explanation:
+            "Static functions are not associated with a specific object instance, but with the class itself. Since `virtual` functions rely on a specific object's type at runtime, static functions cannot be virtual.",
+        },
+        {
+          part: 1,
+          question: "Q25. Function overloading is an example of:",
+          options: [
+            "a) Runtime polymorphism",
+            "b) Compile-time polymorphism",
+            "c) Data hiding",
+            "d) Abstraction",
+          ],
+          correct: "b",
+          explanation:
+            "The compiler resolves which overloaded function to call based on the arguments at compile-time. This is also known as static polymorphism.",
+        },
+        {
+          part: 1,
+          question:
+            "Q26. Which keyword is used to handle multiple inheritance ambiguity?",
+          options: ["a) final", "b) virtual", "c) override", "d) explicit"],
+          correct: "b",
+          explanation:
+            "Using `virtual` inheritance ensures that a derived class with multiple base classes that share a common grandparent receives only one copy of the grandparent's members, solving the 'diamond problem'.",
+        },
+        {
+          part: 1,
+          question: "Q27. Which loop in C++ executes at least once?",
+          options: ["a) for", "b) while", "c) do-while", "d) none"],
+          correct: "c",
+          explanation:
+            "A `do-while` loop is an exit-controlled loop, where the condition is checked after the loop body is executed. Therefore, it always runs at least one time.",
+        },
+        {
+          part: 1,
+          question: "Q28. Which statement is wrong about arrays in C++?",
+          options: [
+            "a) Size must be known at compile-time",
+            "b) Array index starts at 1",
+            "c) Can store elements of same type",
+            "d) Array elements are contiguous",
+          ],
+          correct: "b",
+          explanation:
+            "In C++, array indexing is zero-based, meaning the first element is at index 0.",
+        },
+        {
+          part: 1,
+          question: "Q29. What is the default return type of main() in C++?",
+          options: ["a) void", "b) int", "c) float", "d) long"],
+          correct: "b",
+          explanation:
+            "The C++ standard requires the `main` function to have a return type of `int` to indicate the program's exit status to the operating system.",
+        },
+        {
+          part: 1,
+          question:
+            "Q30. What is the correct order of constructor invocation in inheritance?",
+          options: [
+            "a) Derived → Base",
+            "b) Base → Derived",
+            "c) Random",
+            "d) Depends on compiler",
+          ],
+          correct: "b",
+          explanation:
+            "When a derived class object is created, the base class constructor is always called first, followed by the derived class constructor.",
+        },
+        {
+          part: 1,
+          question:
+            "Q31. Which of the following allocates memory but doesn’t initialize it?",
+          options: ["a) new", "b) malloc()", "c) calloc()", "d) delete"],
+          correct: "b",
+          explanation:
+            "`malloc()` allocates a block of memory but leaves it uninitialized (containing garbage values). `calloc()` allocates and zero-initializes memory.",
+        },
+        {
+          part: 1,
+          question: "Q32. Destructor of a class:",
+          options: [
+            "a) Can be overloaded",
+            "b) Cannot be virtual",
+            "c) Has same name as class with ~",
+            "d) Takes arguments",
+          ],
+          correct: "c",
+          explanation:
+            "A destructor has the same name as the class, preceded by a tilde (~). It cannot be overloaded and does not take arguments.",
+        },
+        {
+          part: 1,
+          question: "Q33. Which operator is used for scope resolution?",
+          options: ["a) .", "b) ->", "c) ::", "d) :"],
+          correct: "c",
+          explanation:
+            "The `::` operator is used to access members of a namespace, access static members of a class, or resolve ambiguity in multiple inheritance.",
+        },
+        {
+          part: 1,
+          question: "Q34. Friend function has access to:",
+          options: [
+            "a) Only public members",
+            "b) Only protected members",
+            "c) All members (private + protected + public)",
+            "d) Only static members",
+          ],
+          correct: "c",
+          explanation:
+            "A `friend` function is a non-member function that is granted full access to the private and protected members of the class that declares it as a friend.",
+        },
+        {
+          part: 1,
+          question: "Q35. Which statement is true for namespaces?",
+          options: [
+            "a) Prevents name conflicts",
+            "b) Must be declared only in header",
+            "c) Cannot contain classes",
+            "d) Cannot be nested",
+          ],
+          correct: "a",
+          explanation:
+            "The primary purpose of a namespace is to provide a scope for identifiers (types, functions, variables, etc.) to avoid name collisions.",
+        },
+        {
+          part: 1,
+          question:
+            "Q36. Which feature allows C++ functions to have default values?",
+          options: [
+            "a) Polymorphism",
+            "b) Function overloading",
+            "c) Default arguments",
+            "d) Static binding",
+          ],
+          correct: "c",
+          explanation:
+            "Default arguments allow a function to be called with fewer arguments than it is declared with, as the compiler will supply the default values for the omitted ones.",
+        },
+        {
+          part: 1,
+          question: "Q37. Which header is needed for STL containers?",
+          options: [
+            "a) <stl.h>",
+            "b) <containers>",
+            "c) <bits/stdc++.h>",
+            "d) <vector>, <map>, etc.",
+          ],
+          correct: "d",
+          explanation:
+            "Each STL container is defined in its own specific header file, such as `<vector>` for `std::vector`, `<map>` for `std::map`, and so on.",
+        },
+        {
+          part: 1,
+          question: "Q38. The return type of sizeof operator is:",
+          options: [
+            "a) int",
+            "b) long",
+            "c) unsigned int / size_t",
+            "d) float",
+          ],
+          correct: "c",
+          explanation:
+            "The `sizeof` operator yields a value of an implementation-defined unsigned integer type, which is `size_t`.",
+        },
+        {
+          part: 1,
+          question: "Q39. Which keyword restricts class inheritance?",
+          options: ["a) sealed", "b) final", "c) restrict", "d) virtual"],
+          correct: "b",
+          explanation:
+            "In C++11 and later, the `final` specifier can be used to prevent a class from being inherited or a virtual function from being overridden.",
+        },
+        {
+          part: 1,
+          question: "Q40. RTTI in C++ is used for:",
+          options: [
+            "a) Compile-time checking",
+            "b) Runtime type identification",
+            "c) Template instantiation",
+            "d) Exception handling",
+          ],
+          correct: "b",
+          explanation:
+            "Run-Time Type Information (RTTI) allows the program to determine the type of an object during runtime, primarily through `dynamic_cast` and `typeid`.",
+        },
+        {
+          part: 1,
+          question: "Q41. The keyword mutable in C++:",
+          options: [
+            "a) Makes a member variable constant",
+            "b) Allows modification of const objects",
+            "c) Prevents modification of data",
+            "d) Makes a function inline",
+          ],
+          correct: "b",
+          explanation:
+            "A `mutable` data member can be modified even if it is part of an object that was declared `const`.",
+        },
+        {
+          part: 1,
+          question: "Q42. Which operator is overloaded for input stream?",
+          options: ["a) <<", "b) >>", "c) ->", "d) []"],
+          correct: "b",
+          explanation:
+            "The `>>` operator (stream extraction) is overloaded to read formatted data from an input stream like `cin`.",
+        },
+        {
+          part: 1,
+          question: "Q43. Which is faster for random access in C++?",
+          options: ["a) List", "b) Vector", "c) Map", "d) Queue"],
+          correct: "b",
+          explanation:
+            "`std::vector` stores elements in a contiguous block of memory, allowing for constant time O(1) random access using the `[]` operator. `std::list` is a linked list and requires linear time O(n) traversal.",
+        },
+        {
+          part: 1,
+          question: "Q44. The default storage class for local variables is:",
+          options: ["a) register", "b) static", "c) auto", "d) extern"],
+          correct: "c",
+          explanation:
+            "Variables declared inside a function without any storage class specifier are `auto` by default, meaning they have automatic storage duration.",
+        },
+        {
+          part: 1,
+          question: "Q45. What is thrown by new when memory allocation fails?",
+          options: [
+            "a) NULL",
+            "b) std::bad_alloc",
+            "c) -1",
+            "d) segmentation fault",
+          ],
+          correct: "b",
+          explanation:
+            "By default, if the `new` operator fails to allocate memory, it throws an exception of type `std::bad_alloc`.",
+        },
+        {
+          part: 1,
+          question: "Q46. Which of the following is evaluated at compile-time?",
+          options: [
+            "a) inline function",
+            "b) constexpr",
+            "c) dynamic_cast",
+            "d) virtual functions",
+          ],
+          correct: "b",
+          explanation:
+            "The `constexpr` keyword indicates that the value of a variable or function can be evaluated at compile time, allowing for significant optimizations.",
+        },
+        {
+          part: 1,
+          question: "Q47. In multiple catch blocks, order matters because:",
+          options: [
+            "a) C++ chooses randomly",
+            "b) Derived exception must come before base",
+            "c) Base must always come first",
+            "d) Compiler ignores order",
+          ],
+          correct: "b",
+          explanation:
+            "Catch blocks are checked in order. If a base class exception handler comes before a derived one, it will catch the derived exception as well, and the more specific handler will never be reached.",
+        },
+        {
+          part: 1,
+          question: "Q48. Which header contains setw and setprecision?",
+          options: [
+            "a) <iomanip>",
+            "b) <iostream>",
+            "c) <string>",
+            "d) <fstream>",
+          ],
+          correct: "a",
+          explanation:
+            "The `<iomanip>` header (input/output manipulation) contains manipulators like `setw`, `setprecision`, and `setfill`.",
+        },
+        {
+          part: 1,
+          question: "Q49. Which STL container follows FIFO?",
+          options: ["a) Queue", "b) Stack", "c) List", "d) Vector"],
+          correct: "a",
+          explanation:
+            "`std::queue` is a container adaptor that provides a First-In, First-Out (FIFO) data structure.",
+        },
+        {
+          part: 1,
+          question:
+            "Q50. Which keyword makes an exception handler catch all types?",
+          options: ["a) catch(all)", "b) catch(...)", "c) default", "d) any"],
+          correct: "b",
+          explanation:
+            "The `catch(...)` block is a catch-all handler that will catch any type of exception that has been thrown.",
+        },
+
+        // Part 2: Q51-100
+        {
+          part: 2,
+          question: "Q51. What will be the output?",
+          code: "int a = 5, b = 2;\ncout << a / b;",
+          options: ["a) 2.5", "b) 2", "c) 3", "d) Error"],
+          correct: "b",
+          explanation:
+            "In C++, dividing two integers results in an integer division, where the fractional part is truncated. Therefore, 5 / 2 evaluates to 2.",
+        },
+        {
+          part: 2,
+          question: "Q52. What will be printed?",
+          code: "double x = 5/2;\ncout << x;",
+          options: ["a) 2.5", "b) 2.0", "c) 2", "d) Error"],
+          correct: "b",
+          explanation:
+            "The expression `5/2` involves two integers, so integer division is performed first, resulting in 2. This integer result is then assigned to the double `x`, making it 2.0. The output is 2.",
+        },
+        {
+          part: 2,
+          question: "Q53. What is the output?",
+          code: 'int a = 10;\ncout << ++a << " " << a++;',
+          options: ["a) 10 11", "b) 11 11", "c) 11 10", "d) 11 12"],
+          correct: "b",
+          explanation:
+            "The order of evaluation of function arguments is unspecified in C++. This leads to undefined behavior. However, on many compilers, the expression evaluates right-to-left, making it print '11 11', but this cannot be relied upon.",
+        },
+        {
+          part: 2,
+          question: "Q54. Predict output:",
+          code: 'if (0)\n    cout << "Hello";\nelse\n    cout << "World";',
+          options: ["a) Hello", "b) World", "c) Error", "d) Nothing"],
+          correct: "b",
+          explanation:
+            "In C++, 0 evaluates to `false`. Since the `if` condition is false, the `else` block is executed, printing 'World'.",
+        },
+        {
+          part: 2,
+          question: "Q55. Output?",
+          code: "int x = 5;\ncout << (x > 2 ? x : 2);",
+          options: ["a) 2", "b) 5", "c) true", "d) false"],
+          correct: "b",
+          explanation:
+            "This is a ternary operator. The condition `x > 2` (5 > 2) is true, so the first expression `x` is evaluated and printed, which is 5.",
+        },
+        {
+          part: 2,
+          question: "Q56. What will this print?",
+          code: "void fun(int &x) {\n    x++;\n}\n\nint main() {\n    int a = 10;\n    fun(a);\n    cout << a;\n}",
+          options: ["a) 9", "b) 10", "c) 11", "d) Error"],
+          correct: "c",
+          explanation:
+            "The function `fun` takes its argument by reference (`int &x`). This means any change to `x` inside the function directly affects the original variable `a`. So, `a` becomes 11.",
+        },
+        {
+          part: 2,
+          question: "Q57. Output of program:",
+          code: "inline int square(int x) { return x*x; }\n\nint main() {\n    cout << square(5+1);\n}",
+          options: ["a) 36", "b) 11", "c) 61", "d) Error"],
+          correct: "a",
+          explanation:
+            "The expression `5+1` is evaluated first, resulting in 6. This value is passed to the `square` function, which returns 6*6 = 36.",
+        },
+        {
+          part: 2,
+          question: "Q58. Result?",
+          code: "int *p = new int(25);\ncout << *p;\ndelete p;",
+          options: ["a) Garbage", "b) 25", "c) Error", "d) NULL"],
+          correct: "b",
+          explanation:
+            "`new int(25)` allocates memory for an integer and initializes it with the value 25. The pointer `p` holds the address, and `*p` dereferences it to print the value 25.",
+        },
+        {
+          part: 2,
+          question: "Q59. What is the output?",
+          code: 'class Test {\npublic:\n    Test() { cout << "C"; }\n    ~Test() { cout << "D"; }\n};\n\nint main() {\n    Test t;\n}',
+          options: ["a) C", "b) D", "c) CD", "d) DC"],
+          correct: "c",
+          explanation:
+            "The constructor is called when the object `t` is created, printing 'C'. The destructor is called when `t` goes out of scope at the end of `main`, printing 'D'.",
+        },
+        {
+          part: 2,
+          question: "Q60. Output?",
+          code: 'class Base {\npublic:\n    Base() { cout << "B"; }\n};\n\nclass Derived : public Base {\npublic:\n    Derived() { cout << "D"; }\n};\n\nint main() {\n    Derived d;\n}',
+          options: ["a) B", "b) D", "c) BD", "d) DB"],
+          correct: "c",
+          explanation:
+            "When a derived object is created, the base class constructor is called first, printing 'B', followed by the derived class constructor, printing 'D'.",
+        },
+        {
+          part: 2,
+          question: "Q61. What is printed?",
+          code: 'class A {\npublic:\n    A() { cout << "A"; }\n};\n\nclass B : public A {\npublic:\n    B() { cout << "B"; }\n};\n\nclass C : public B {\npublic:\n    C() { cout << "C"; }\n};\n\nint main() {\n    C obj;\n}',
+          options: ["a) ABC", "b) CBA", "c) BAC", "d) Error"],
+          correct: "a",
+          explanation:
+            "In multilevel inheritance, constructors are called in order from the top-most base class down to the most derived class. So, A's constructor runs, then B's, then C's.",
+        },
+        {
+          part: 2,
+          question: "Q62. Output?",
+          code: 'class A {\npublic:\n    A() { cout << "A"; }\n    virtual ~A() { cout << "D"; }\n};\n\nint main() {\n    A *a = new A();\n    delete a;\n}',
+          options: ["a) A", "b) AD", "c) D", "d) Error"],
+          correct: "b",
+          explanation:
+            "`new A()` calls the constructor, printing 'A'. `delete a` calls the destructor, printing 'D'.",
+        },
+        {
+          part: 2,
+          question: "Q63. Output?",
+          code: 'class A {\npublic:\n    virtual void show() { cout << "A"; }\n};\n\nclass B : public A {\npublic:\n    void show() override { cout << "B"; }\n};\n\nint main() {\n    A* p = new B();\n    p->show();\n}',
+          options: ["a) A", "b) B", "c) Error", "d) AB"],
+          correct: "b",
+          explanation:
+            "Because `show()` is a virtual function, the call `p->show()` is resolved at runtime. Since `p` points to an object of type `B`, `B::show()` is called, printing 'B'.",
+        },
+        {
+          part: 2,
+          question: "Q64. Output of code:",
+          code: 'class A {\npublic:\n    A() { cout << "A"; }\n};\n\nclass B {\n    A a;\npublic:\n    B() { cout << "B"; }\n};\n\nint main() {\n    B obj;\n}',
+          options: ["a) AB", "b) BA", "c) B", "d) A"],
+          correct: "a",
+          explanation:
+            "When an object of class `B` is created, the constructor of its member object `a` (of class A) is called first, printing 'A'. Then, the body of `B`'s constructor is executed, printing 'B'.",
+        },
+        {
+          part: 2,
+          question: "Q65. Predict output:",
+          code: 'try {\n    throw 10;\n} catch (int x) {\n    cout << "Caught " << x;\n}',
+          options: ["a) Caught 0", "b) Caught 10", "c) Error", "d) Nothing"],
+          correct: "b",
+          explanation:
+            "The code throws an integer value of 10. The `catch` block for type `int` successfully catches this exception and prints the message with the caught value.",
+        },
+        {
+          part: 2,
+          question: "Q66. What happens?",
+          code: 'try {\n    throw \'A\';\n} catch (int x) {\n    cout << "int";\n} catch (...) {\n    cout << "default";\n}',
+          options: ["a) int", "b) default", "c) Error", "d) Nothing"],
+          correct: "b",
+          explanation:
+            "A `char` ('A') is thrown. The first `catch` block looks for an `int` and does not match. The second block, `catch(...)`, is a catch-all and will handle any type of exception. Thus, 'default' is printed.",
+        },
+        {
+          part: 2,
+          question: "Q67. Output?",
+          code: "cout << setw(5) << 42;",
+          options: [
+            "a) 42",
+            "b) 00042",
+            "c) ___42 (3 spaces before)",
+            "d) Error",
+          ],
+          correct: "c",
+          explanation:
+            "`setw(5)` sets a minimum field width of 5 characters. The number 42 takes up 2 characters, so it is right-aligned within the field, preceded by 3 spaces.",
+        },
+        {
+          part: 2,
+          question: "Q68. Result of this code:",
+          code: 'ofstream fout("test.txt");\nfout << "Hello";\nfout.close();\ncout << "Done";',
+          options: ["a) Done", "b) Hello", "c) test.txt", "d) Error"],
+          correct: "a",
+          explanation:
+            "The code creates a file named 'test.txt', writes 'Hello' to it, closes the file, and then prints 'Done' to the console. The visible output on the standard output stream is 'Done'.",
+        },
+        {
+          part: 2,
+          question: "Q69. Output?",
+          code: "template <typename T>\nT add(T a, T b) {\n    return a+b;\n}\n\nint main() {\n    cout << add(2,3);\n}",
+          options: ["a) 2", "b) 3", "c) 5", "d) Error"],
+          correct: "c",
+          explanation:
+            "The compiler instantiates the template function `add` with `T` as `int`. The function then returns the sum of 2 and 3, which is 5.",
+        },
+        {
+          part: 2,
+          question: "Q70. What is printed?",
+          code: "vector<int> v = {1,2,3};\ncout << v.size();",
+          options: ["a) 2", "b) 3", "c) Garbage", "d) Error"],
+          correct: "b",
+          explanation:
+            "The vector `v` is initialized with three elements. The `.size()` member function returns the number of elements in the vector, which is 3.",
+        },
+        {
+          part: 2,
+          question: "Q71. Predict output:",
+          code: 'map<int, string> m;\nm[1] = "One";\nm[1] = "First";\ncout << m[1];',
+          options: ["a) One", "b) First", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            'A `std::map` stores unique keys. The first line `m[1] = "One";` inserts a key-value pair. The second line `m[1] = "First";` finds the existing key 1 and updates its value to \'First\'. The output is the final value.',
+        },
+        {
+          part: 2,
+          question: "Q72. Output?",
+          code: "const int x = 10;\nconst int *p = &x;\ncout << *p;",
+          options: ["a) 10", "b) Garbage", "c) Error", "d) NULL"],
+          correct: "a",
+          explanation:
+            "A pointer `p` is created to point to the constant integer `x`. Dereferencing `p` (`*p`) correctly retrieves and prints the value of `x`, which is 10.",
+        },
+        {
+          part: 2,
+          question: "Q73. What will this print?",
+          code: "int arr[] = {10,20,30};\ncout << *(arr+1);",
+          options: ["a) 10", "b) 20", "c) 30", "d) Error"],
+          correct: "b",
+          explanation:
+            "Pointer arithmetic is used here. `arr` points to the first element (index 0). `arr+1` points to the second element (index 1). Dereferencing it with `*` gives the value at that location, which is 20.",
+        },
+        {
+          part: 2,
+          question: "Q74. Predict output:",
+          code: 'class A {\npublic:\n    A() { cout << "A"; }\n    A(const A&) { cout << "Copy"; }\n};\n\nint main() {\n    A a1;\n    A a2 = a1;\n}',
+          options: ["a) A", "b) Copy", "c) ACopy", "d) Error"],
+          correct: "c",
+          explanation:
+            "`A a1;` calls the default constructor, printing 'A'. `A a2 = a1;` is an initialization, not an assignment, so it calls the copy constructor, printing 'Copy'.",
+        },
+        {
+          part: 2,
+          question: "Q75. What is the output?",
+          code: "int a = 5;\nint &r = a;\nr = 10;\ncout << a;",
+          options: ["a) 5", "b) 10", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "`r` is a reference to `a`. Any change made to the reference `r` is reflected in the original variable `a`. Therefore, `a` becomes 10.",
+        },
+        {
+          part: 2,
+          question: "Q76. Output of code?",
+          code: 'class Base {\npublic:\n    virtual void show() { cout << "Base"; }\n};\nclass Derived : public Base {\npublic:\n    void show() { cout << "Derived"; }\n};\nint main() {\n    Base b;\n    Derived d;\n    Base *ptr = &d;\n    ptr->show();\n}',
+          options: ["a) Base", "b) Derived", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "Because `show()` is virtual, the call is resolved at runtime. Since the base class pointer `ptr` points to a `Derived` object, the `Derived` class's version of `show()` is executed.",
+        },
+        {
+          part: 2,
+          question: "Q77. Output?",
+          code: 'class A {\npublic:\n    void fun() { cout << "A"; }\n};\nclass B : public A {\npublic:\n    void fun(int) { cout << "B"; }\n};\nint main() {\n    B obj;\n    obj.fun();\n}',
+          options: ["a) Error", "b) B", "c) A", "d) Garbage"],
+          correct: "a",
+          explanation:
+            "The function `fun(int)` in the derived class `B` hides the `fun()` from the base class `A` (this is called name hiding). Since there is no `fun()` with no arguments in class `B`, the call `obj.fun()` results in a compile-time error.",
+        },
+        {
+          part: 2,
+          question: "Q78. Predict output:",
+          code: 'char str[] = "C++";\ncout << str;',
+          options: ["a) C", "b) C+", "c) C++", "d) Error"],
+          correct: "c",
+          explanation:
+            "When a character array is passed to `cout`, it is treated as a C-style string, and the entire string is printed until the null terminator is encountered.",
+        },
+        {
+          part: 2,
+          question: "Q79. Output?",
+          code: "cout << sizeof('A');",
+          options: ["a) 1", "b) 2", "c) 4", "d) Depends on compiler"],
+          correct: "a",
+          explanation:
+            "In C++, character literals like 'A' are of type `char`, and `sizeof(char)` is guaranteed to be 1.",
+        },
+        {
+          part: 2,
+          question: "Q80. What will print?",
+          code: "int *p = NULL;\ncout << (p==0);",
+          options: ["a) 0", "b) 1", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "`NULL` is typically defined as 0. The comparison `p==0` evaluates to true. In C++, `true` is converted to the integer 1 for output.",
+        },
+        {
+          part: 2,
+          question: "Q81. Output of this:",
+          code: 'try {\n    throw "Error";\n} catch (const char* s) {\n    cout << s;\n}',
+          options: ["a) Error", "b) 0", "c) NULL", "d) Exception"],
+          correct: "a",
+          explanation:
+            'A string literal like "Error" is of type `const char*`. The `catch` block correctly catches this type and prints the string.',
+        },
+        {
+          part: 2,
+          question: "Q82. Result?",
+          code: 'class A {\npublic:\n    virtual void f() { cout << "A"; }\n};\nclass B : public A {\npublic:\n    void f() { cout << "B"; }\n};\nint main() {\n    A a;\n    B b;\n    A* ptr = &a;\n    ptr->f();\n}',
+          options: ["a) A", "b) B", "c) Error", "d) AB"],
+          correct: "a",
+          explanation:
+            "The pointer `ptr` is of type `A*` and points to an object `a` of type `A`. The call `ptr->f()` therefore calls the `f()` method of class `A`.",
+        },
+        {
+          part: 2,
+          question: "Q83. Output?",
+          code: "int a=10;\ncout << (a, 20);",
+          options: ["a) 10", "b) 20", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "This uses the comma operator. It evaluates the expression on the left (`a`), discards the result, and then evaluates the expression on the right (20), returning its value. So, 20 is printed.",
+        },
+        {
+          part: 2,
+          question: "Q84. Output of program?",
+          code: 'string s = "Hello";\ncout << s.length();',
+          options: ["a) 4", "b) 5", "c) 6", "d) Error"],
+          correct: "b",
+          explanation:
+            "The `.length()` (or `.size()`) member function of the `std::string` class returns the number of characters in the string, which is 5.",
+        },
+        {
+          part: 2,
+          question: "Q85. Predict output:",
+          code: 'int a=5;\ncout << (a==5 ? "Yes" : "No");',
+          options: ["a) Yes", "b) No", "c) Error", "d) 1"],
+          correct: "a",
+          explanation:
+            'The condition `a==5` is true, so the ternary operator evaluates to its first value, the string literal "Yes".',
+        },
+        {
+          part: 2,
+          question: "Q86. What happens?",
+          code: "enum Color {Red, Green=5, Blue};\ncout << Blue;",
+          options: ["a) 2", "b) 5", "c) 6", "d) Error"],
+          correct: "c",
+          explanation:
+            "Enum values are integers. `Red` is 0 by default. `Green` is explicitly set to 5. `Blue` takes the next value after the previous one, so it becomes 6.",
+        },
+        {
+          part: 2,
+          question: "Q87. Output?",
+          code: "int x = 10;\nconst int &ref = x;\ncout << ref;",
+          options: ["a) Garbage", "b) 0", "c) 10", "d) Error"],
+          correct: "c",
+          explanation:
+            "`ref` is a constant reference to `x`. It correctly refers to `x` and prints its value, 10. The `const` means you cannot change `x` through `ref`.",
+        },
+        {
+          part: 2,
+          question: "Q88. Predict output:",
+          code: "class Test {\npublic:\n    static int count;\n    Test() { count++; }\n};\nint Test::count = 0;\nint main() {\n    Test t1, t2, t3;\n    cout << Test::count;\n}",
+          options: ["a) 1", "b) 2", "c) 3", "d) Garbage"],
+          correct: "c",
+          explanation:
+            "`count` is a static member, shared by all objects of the class. The constructor is called three times (for t1, t2, t3), each time incrementing the shared `count` variable. The final value is 3.",
+        },
+        {
+          part: 2,
+          question: "Q89. Output?",
+          code: "int x = 10;\nint y = 20;\nint &r = x;\nr = y;\ncout << x;",
+          options: ["a) 10", "b) 20", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "`r` is a reference to `x`. The line `r = y;` does not re-seat the reference; it assigns the value of `y` (20) to the variable that `r` refers to, which is `x`. So `x` becomes 20.",
+        },
+        {
+          part: 2,
+          question: "Q90. Output of code:",
+          code: 'class A {\npublic:\n    virtual void show() { cout << "A"; }\n};\nclass B: public A {\npublic:\n    void show() { cout << "B"; }\n};\nint main() {\n    A obj;\n    obj.show();\n}',
+          options: ["a) A", "b) B", "c) AB", "d) Error"],
+          correct: "a",
+          explanation:
+            "The object `obj` is of type `A`. The call `obj.show()` directly calls the `show` method of class `A`. Polymorphism only occurs when using pointers or references to base classes.",
+        },
+        {
+          part: 2,
+          question: "Q91. Result?",
+          code: 'cout << (sizeof(int) > 2 ? "Yes" : "No");',
+          options: ["a) Yes", "b) No", "c) Error", "d) Garbage"],
+          correct: "a",
+          explanation:
+            "On most modern systems, `sizeof(int)` is 4 bytes. Since 4 is greater than 2, the condition is true, and the ternary operator evaluates to 'Yes'.",
+        },
+        {
+          part: 2,
+          question: "Q92. What happens?",
+          code: 'try {\n    throw 1.5;\n} catch (int e) {\n    cout << "int";\n} catch (...) {\n    cout << "other";\n}',
+          options: ["a) int", "b) other", "c) Error", "d) Nothing"],
+          correct: "b",
+          explanation:
+            "A `double` (1.5) is thrown. The first `catch` block for `int` does not match. The catch-all block `catch(...)` matches any type, so 'other' is printed.",
+        },
+        {
+          part: 2,
+          question: "Q93. Output?",
+          code: "int arr[3] = {1,2,3};\ncout << arr[3];",
+          options: ["a) 3", "b) Garbage", "c) Error", "d) Undefined behavior"],
+          correct: "d",
+          explanation:
+            "The array `arr` has valid indices 0, 1, and 2. Accessing `arr[3]` is an out-of-bounds access, which results in undefined behavior. It might print garbage, crash, or appear to work by coincidence.",
+        },
+        {
+          part: 2,
+          question: "Q94. Output?",
+          code: 'string s="C++";\ncout << s[1];',
+          options: ["a) C", "b) +", "c) ++", "d) Error"],
+          correct: "b",
+          explanation:
+            "String indexing is zero-based. `s[0]` is 'C', and `s[1]` is the character at the second position, which is '+'.",
+        },
+        {
+          part: 2,
+          question: "Q95. Predict output:",
+          code: "int a = 0;\ncout << (a && 5);",
+          options: ["a) 0", "b) 5", "c) 1", "d) Error"],
+          correct: "a",
+          explanation:
+            "This is a logical AND (`&&`). Since the first operand `a` (0) is false, the expression short-circuits and evaluates to false. In C++, `false` is output as 0.",
+        },
+        {
+          part: 2,
+          question: "Q96. Output?",
+          code: "int a=5;\ndo {\n    cout << a;\n} while(a<5);",
+          options: ["a) 5", "b) 55… infinite", "c) Nothing", "d) Error"],
+          correct: "a",
+          explanation:
+            "A `do-while` loop executes its body once before checking the condition. It prints 5. Then it checks the condition `a<5` (5<5), which is false, and the loop terminates.",
+        },
+        {
+          part: 2,
+          question: "Q97. Output?",
+          code: "int a=5;\nwhile(a<5) {\n    cout << a;\n}",
+          options: ["a) 5", "b) Nothing", "c) Infinite loop", "d) Error"],
+          correct: "b",
+          explanation:
+            "A `while` loop checks its condition before executing. Since `a<5` (5<5) is false initially, the loop body is never entered and nothing is printed.",
+        },
+        {
+          part: 2,
+          question: "Q98. Output?",
+          code: "char c = 'A';\ncout << (int)c;",
+          options: ["a) A", "b) 65", "c) 97", "d) Error"],
+          correct: "b",
+          explanation:
+            "Casting the character 'A' to an integer `(int)c` results in its ASCII value being printed. The ASCII value for 'A' is 65.",
+        },
+        {
+          part: 2,
+          question: "Q99. What is printed?",
+          code: "int a=10;\ncout << (a>>1);",
+          options: ["a) 10", "b) 5", "c) 20", "d) Error"],
+          correct: "b",
+          explanation:
+            "The `>>` operator is a bitwise right shift. Shifting the bits of 10 (binary 1010) one position to the right results in 5 (binary 0101). It is equivalent to integer division by 2.",
+        },
+        {
+          part: 2,
+          question: "Q100. Output?",
+          code: "int a=3, b=2;\ncout << a % b;",
+          options: ["a) 1", "b) 2", "c) 3", "d) Error"],
+          correct: "a",
+          explanation:
+            "The modulus operator `%` gives the remainder of a division. The remainder of 3 divided by 2 is 1.",
+        },
+
+        // Part 3: Q101-150
+        {
+          part: 3,
+          question:
+            "Q101. Which of the following is not a valid C++ data type?",
+          options: ["a) int", "b) float", "c) real", "d) double"],
+          correct: "c",
+          explanation:
+            "`real` is not a built-in data type in C++. `int`, `float`, and `double` are standard fundamental types.",
+        },
+        {
+          part: 3,
+          question:
+            "Q102. Which function is executed automatically when an object goes out of scope?",
+          options: [
+            "a) Constructor",
+            "b) Destructor",
+            "c) Inline function",
+            "d) Friend function",
+          ],
+          correct: "b",
+          explanation:
+            "The destructor is called automatically for an object when its lifetime ends, for example, when it goes out of scope or is explicitly deleted.",
+        },
+        {
+          part: 3,
+          question:
+            "Q103. Which keyword is used to define a user-defined namespace?",
+          options: ["a) package", "b) namespace", "c) using", "d) class"],
+          correct: "b",
+          explanation:
+            "The `namespace` keyword is used to declare a new scope to prevent name conflicts in large projects.",
+        },
+        {
+          part: 3,
+          question: "Q104. Which of the following is a dynamic cast operator?",
+          options: [
+            "a) cast<>",
+            "b) static_cast<>",
+            "c) dynamic_cast<>",
+            "d) reinterpret_cast<>",
+          ],
+          correct: "c",
+          explanation:
+            "`dynamic_cast` is used for safe downcasting in class hierarchies. It performs a runtime check to ensure the conversion is valid.",
+        },
+        {
+          part: 3,
+          question:
+            "Q105. Which feature allows the same function name with different parameter lists?",
+          options: [
+            "a) Inheritance",
+            "b) Polymorphism",
+            "c) Function Overloading",
+            "d) Encapsulation",
+          ],
+          correct: "c",
+          explanation:
+            "Function overloading allows multiple functions with the same name but different parameters (type, number, or order) to coexist in the same scope.",
+        },
+        {
+          part: 3,
+          question: "Q106. Which is evaluated at runtime?",
+          options: [
+            "a) Function Overloading",
+            "b) Operator Overloading",
+            "c) Virtual Function Dispatch",
+            "d) Inline Expansion",
+          ],
+          correct: "c",
+          explanation:
+            "Virtual function calls are resolved at runtime based on the actual type of the object, which is known as dynamic dispatch or late binding.",
+        },
+        {
+          part: 3,
+          question:
+            "Q107. Which loop is most suitable when the number of iterations is known?",
+          options: ["a) while", "b) do-while", "c) for", "d) goto"],
+          correct: "c",
+          explanation:
+            "The `for` loop is ideal when the number of iterations is known beforehand, as its structure cleanly handles initialization, condition checking, and iteration in one line.",
+        },
+        {
+          part: 3,
+          question: "Q108. Which C++ principle hides implementation details?",
+          options: [
+            "a) Abstraction",
+            "b) Polymorphism",
+            "c) Inheritance",
+            "d) Overloading",
+          ],
+          correct: "a",
+          explanation:
+            "Abstraction is the concept of hiding complex implementation details and showing only the essential features of the object.",
+        },
+        {
+          part: 3,
+          question: "Q109. Which of the following cannot be used with switch?",
+          options: ["a) int", "b) char", "c) float", "d) enum"],
+          correct: "c",
+          explanation:
+            "The `switch` statement requires a constant expression of an integral or enumeration type. Floating-point types like `float` and `double` are not allowed.",
+        },
+        {
+          part: 3,
+          question: "Q110. Which operator has the highest precedence in C++?",
+          options: [
+            "a) ++ (postfix)",
+            "b) * (multiplication)",
+            "c) = (assignment)",
+            "d) &&",
+          ],
+          correct: "a",
+          explanation:
+            "Postfix increment/decrement operators `++` and `--`, along with function call `()` and array subscription `[]`, have a very high precedence.",
+        },
+        {
+          part: 3,
+          question:
+            "Q111. Which of the following is not true about references?",
+          options: [
+            "a) Must be initialized at declaration",
+            "b) Can be reassigned to another variable",
+            "c) Alias to a variable",
+            "d) Uses & symbol",
+          ],
+          correct: "b",
+          explanation:
+            "A reference, once initialized to refer to a variable, cannot be 'reseated' or reassigned to refer to a different variable. It remains an alias for the original variable.",
+        },
+        {
+          part: 3,
+          question: "Q112. A constructor that takes no arguments is called:",
+          options: [
+            "a) Null constructor",
+            "b) Default constructor",
+            "c) Copy constructor",
+            "d) Empty function",
+          ],
+          correct: "b",
+          explanation:
+            "A default constructor is a constructor that can be called with no arguments. This includes a constructor with no parameters or one where all parameters have default values.",
+        },
+        {
+          part: 3,
+          question:
+            "Q113. Which keyword is used to prevent overriding in C++11?",
+          options: ["a) static", "b) final", "c) const", "d) restrict"],
+          correct: "b",
+          explanation:
+            "The `final` keyword, when applied to a virtual function, prevents it from being overridden in any further derived classes.",
+        },
+        {
+          part: 3,
+          question:
+            "Q114. Which storage class makes a variable persist across function calls?",
+          options: ["a) auto", "b) register", "c) static", "d) extern"],
+          correct: "c",
+          explanation:
+            "A `static` local variable is initialized only once and retains its value between function calls.",
+        },
+        {
+          part: 3,
+          question:
+            "Q115. Which header contains exception classes like bad_alloc?",
+          options: [
+            "a) <stdlib.h>",
+            "b) <new>",
+            "c) <exception>",
+            "d) <stdexcept>",
+          ],
+          correct: "b",
+          explanation:
+            "The `std::bad_alloc` exception class is defined in the `<new>` header, as it is related to dynamic memory allocation failures.",
+        },
+        {
+          part: 3,
+          question:
+            "Q116. Which function is called automatically when a new object is created by copying?",
+          options: [
+            "a) Assignment operator",
+            "b) Copy constructor",
+            "c) Destructor",
+            "d) Default constructor",
+          ],
+          correct: "b",
+          explanation:
+            "The copy constructor is called when a new object is initialized with the value of an existing object of the same type.",
+        },
+        {
+          part: 3,
+          question: "Q117. Which type of casting is safest in C++?",
+          options: [
+            "a) reinterpret_cast",
+            "b) static_cast",
+            "c) dynamic_cast",
+            "d) const_cast",
+          ],
+          correct: "c",
+          explanation:
+            "`dynamic_cast` is the safest cast for polymorphic types because it performs a runtime check to ensure the conversion is valid. If it fails for a pointer, it returns `nullptr`.",
+        },
+        {
+          part: 3,
+          question:
+            "Q118. Which operator must be a member function if overloaded?",
+          options: ["a) +", "b) =", "c) []", "d) ()"],
+          correct: "b",
+          explanation:
+            "The assignment (`=`), subscript (`[]`), function call (`()`), and member access (`->`) operators must be overloaded as non-static member functions.",
+        },
+        {
+          part: 3,
+          question: "Q119. Which header is needed for STL queue?",
+          options: ["a) <queue>", "b) <list>", "c) <stl.h>", "d) <deque>"],
+          correct: "a",
+          explanation:
+            "The `std::queue` container adaptor is defined in the `<queue>` header file.",
+        },
+        {
+          part: 3,
+          question:
+            "Q120. Which class is the base of all stream classes in C++?",
+          options: ["a) ios", "b) ostream", "c) istream", "d) iostream"],
+          correct: "a",
+          explanation:
+            "The `ios` class is an indirect base class for all I/O stream classes and contains formatting flags and error state information.",
+        },
+        {
+          part: 3,
+          question: "Q121. Which exception is thrown when dynamic_cast fails?",
+          options: [
+            "a) bad_cast",
+            "b) bad_alloc",
+            "c) runtime_error",
+            "d) logic_error",
+          ],
+          correct: "a",
+          explanation:
+            "If `dynamic_cast` is used on a reference type and fails, it throws a `std::bad_cast` exception. For pointers, it returns `nullptr`.",
+        },
+        {
+          part: 3,
+          question:
+            "Q122. Which of the following is not a type of inheritance?",
+          options: [
+            "a) Multilevel",
+            "b) Multiple",
+            "c) Hierarchical",
+            "d) Bi-directional",
+          ],
+          correct: "d",
+          explanation:
+            "Single, Multiple, Multilevel, Hierarchical, and Hybrid are the recognized types of inheritance. Bi-directional is not a standard inheritance type.",
+        },
+        {
+          part: 3,
+          question: "Q123. Which operator cannot be made friend?",
+          options: ["a) <<", "b) >>", "c) =", "d) +"],
+          correct: "c",
+          explanation:
+            "The assignment (`=`), subscript (`[]`), call (`()`), and member access (`->`) operators must be member functions and cannot be friend functions.",
+        },
+        {
+          part: 3,
+          question:
+            "Q124. Which concept allows a derived class to replace base class functionality?",
+          options: [
+            "a) Overloading",
+            "b) Overriding",
+            "c) Hiding",
+            "d) Encapsulation",
+          ],
+          correct: "b",
+          explanation:
+            "Method overriding allows a derived class to provide a specific implementation for a virtual function that is already defined in its base class.",
+        },
+        {
+          part: 3,
+          question: "Q125. Which of the following is not part of STL?",
+          options: ["a) Vector", "b) List", "c) Stack", "d) Tree"],
+          correct: "d",
+          explanation:
+            "While containers like `map` and `set` are implemented using balanced binary search trees, there is no generic `std::tree` container in the STL. Vector, List, and Stack are all part of STL.",
+        },
+        {
+          part: 3,
+          question: "Q126. Which access specifier is most restrictive?",
+          options: ["a) public", "b) protected", "c) private", "d) default"],
+          correct: "c",
+          explanation:
+            "`private` members are only accessible within the class itself, making it the most restrictive access specifier.",
+        },
+        {
+          part: 3,
+          question:
+            "Q127. In exception handling, which block must always follow try?",
+          options: ["a) throw", "b) catch", "c) finally", "d) return"],
+          correct: "b",
+          explanation:
+            "A `try` block must be followed by one or more `catch` blocks to handle potential exceptions. C++ does not have a `finally` block.",
+        },
+        {
+          part: 3,
+          question: "Q128. What does explicit keyword do in constructors?",
+          options: [
+            "a) Forces inline expansion",
+            "b) Prevents implicit conversions",
+            "c) Makes constructor virtual",
+            "d) Disables overloading",
+          ],
+          correct: "b",
+          explanation:
+            "An `explicit` constructor prevents the compiler from using it for implicit type conversions, which can help avoid unintended behavior.",
+        },
+        {
+          part: 3,
+          question:
+            "Q129. Which function reads a single character from console?",
+          options: [
+            "a) cin.get()",
+            "b) cin.read()",
+            "c) getline()",
+            "d) getch()",
+          ],
+          correct: "a",
+          explanation:
+            "`cin.get()` is the standard C++ way to read a single character, including whitespace, from an input stream.",
+        },
+        {
+          part: 3,
+          question: "Q130. The STL map stores elements in:",
+          options: [
+            "a) Random order",
+            "b) Sorted order",
+            "c) FIFO order",
+            "d) LIFO order",
+          ],
+          correct: "b",
+          explanation:
+            "`std::map` is an ordered associative container that stores elements in sorted order based on their keys.",
+        },
+        {
+          part: 3,
+          question:
+            "Q131. Which operator is used for member access via pointer?",
+          options: ["a) .", "b) ->", "c) ::", "d) []"],
+          correct: "b",
+          explanation:
+            "The arrow operator `->` is used to access members of an object through a pointer to that object.",
+        },
+        {
+          part: 3,
+          question:
+            "Q132. Which keyword prevents a class from being inherited?",
+          options: ["a) final", "b) restrict", "c) stop", "d) lock"],
+          correct: "a",
+          explanation:
+            "In C++11 and later, specifying a class as `final` prevents any other class from inheriting from it.",
+        },
+        {
+          part: 3,
+          question: "Q133. Which is not a valid type of polymorphism in C++?",
+          options: [
+            "a) Compile-time",
+            "b) Runtime",
+            "c) Hybrid",
+            "d) Constructor",
+          ],
+          correct: "d",
+          explanation:
+            "Polymorphism is broadly categorized into compile-time (static) and runtime (dynamic). 'Constructor' is a special member function, not a type of polymorphism.",
+        },
+        {
+          part: 3,
+          question: "Q134. Which of these can be overloaded?",
+          options: ["a) sizeof", "b) new", "c) ::", "d) ."],
+          correct: "b",
+          explanation:
+            "The `new` and `delete` operators can be overloaded to provide custom memory management schemes. The other operators listed cannot be overloaded.",
+        },
+        {
+          part: 3,
+          question: "Q135. Which header contains typeid for RTTI?",
+          options: [
+            "a) <rtti>",
+            "b) <typeinfo>",
+            "c) <iostream>",
+            "d) <type_traits>",
+          ],
+          correct: "b",
+          explanation:
+            "The `typeid` operator, used for Run-Time Type Information (RTTI), is defined in the `<typeinfo>` header.",
+        },
+        {
+          part: 3,
+          question:
+            "Q136. Which exception is thrown by stoi() on invalid input?",
+          options: [
+            "a) bad_cast",
+            "b) out_of_range",
+            "c) invalid_argument",
+            "d) runtime_error",
+          ],
+          correct: "c",
+          explanation:
+            "If the input string to `std::stoi` does not represent a valid integer, it throws a `std::invalid_argument` exception.",
+        },
+        {
+          part: 3,
+          question:
+            "Q137. Which operator is used with pointers to access value?",
+          options: ["a) ->", "b) &", "c) *", "d) %"],
+          correct: "c",
+          explanation:
+            "The dereference operator `*` is used to access the value stored at the memory address that a pointer holds.",
+        },
+        {
+          part: 3,
+          question: "Q138. In which case is copy constructor invoked?",
+          options: [
+            "a) Passing object by value",
+            "b) Returning object by value",
+            "c) Creating object from another object",
+            "d) All of these",
+          ],
+          correct: "d",
+          explanation:
+            "The copy constructor is invoked in all these scenarios: when an object is passed by value, returned by value, or explicitly initialized from another object.",
+        },
+        {
+          part: 3,
+          question: "Q139. Which keyword is used to declare abstract classes?",
+          options: [
+            "a) interface",
+            "b) abstract",
+            "c) virtual with =0",
+            "d) base",
+          ],
+          correct: "c",
+          explanation:
+            "A class becomes abstract in C++ if it contains at least one pure virtual function, which is a virtual function declared with `= 0`.",
+        },
+        {
+          part: 3,
+          question: "Q140. The STL vector increases size by:",
+          options: [
+            "a) 1 element each time",
+            "b) Doubling capacity",
+            "c) Fixed block",
+            "d) Depends on compiler",
+          ],
+          correct: "b",
+          explanation:
+            "When a vector's capacity is exceeded, it reallocates a larger block of memory, typically doubling its current capacity, to maintain amortized constant-time insertion.",
+        },
+        {
+          part: 3,
+          question:
+            "Q141. Which operator is used to overload insertion for cout?",
+          options: ["a) <<", "b) >>", "c) ->", "d) []"],
+          correct: "a",
+          explanation:
+            "The `<<` operator (stream insertion) is overloaded to write data to an output stream like `cout`.",
+        },
+        {
+          part: 3,
+          question: "Q142. What is the return type of main()?",
+          options: ["a) int", "b) void", "c) long", "d) depends on compiler"],
+          correct: "a",
+          explanation:
+            "The C++ standard mandates that `main()` must return `int` to provide an exit status to the operating system.",
+        },
+        {
+          part: 3,
+          question:
+            "Q143. Which class is used for both input and output file handling?",
+          options: ["a) ifstream", "b) ofstream", "c) fstream", "d) iostream"],
+          correct: "c",
+          explanation:
+            "`fstream` provides the capabilities for both input (`ifstream`) and output (`ofstream`) file operations.",
+        },
+        {
+          part: 3,
+          question: "Q144. Which function is called first when program starts?",
+          options: [
+            "a) global constructor",
+            "b) main()",
+            "c) static block",
+            "d) constructor",
+          ],
+          correct: "b",
+          explanation:
+            "The `main()` function is the designated entry point for every C++ program execution.",
+        },
+        {
+          part: 3,
+          question: "Q145. Which statement about templates is correct?",
+          options: [
+            "a) Provide runtime polymorphism",
+            "b) Provide compile-time polymorphism",
+            "c) Cannot be overloaded",
+            "d) Slower execution",
+          ],
+          correct: "b",
+          explanation:
+            "Templates generate type-specific code at compile time, which is a form of static or compile-time polymorphism.",
+        },
+        {
+          part: 3,
+          question: "Q146. Which header defines std::string?",
+          options: [
+            "a) <string.h>",
+            "b) <string>",
+            "c) <cstring>",
+            "d) <iostream>",
+          ],
+          correct: "b",
+          explanation:
+            "The C++ standard string class `std::string` is defined in the `<string>` header. `<cstring>` and `<string.h>` are for C-style string functions.",
+        },
+        {
+          part: 3,
+          question: "Q147. The default exception handler in C++:",
+          options: [
+            "a) Terminates program",
+            "b) Ignores exception",
+            "c) Converts exception to warning",
+            "d) Prints stack trace",
+          ],
+          correct: "a",
+          explanation:
+            "If an exception is thrown but not caught by any `catch` block, the program calls `std::terminate`, which by default calls `std::abort`, causing abnormal program termination.",
+        },
+        {
+          part: 3,
+          question: "Q148. Which keyword is used to skip one loop iteration?",
+          options: ["a) break", "b) skip", "c) continue", "d) goto"],
+          correct: "c",
+          explanation:
+            "The `continue` statement ends the current iteration of a loop and proceeds to the next iteration.",
+        },
+        {
+          part: 3,
+          question:
+            "Q149. Which pointer is automatically passed to member functions?",
+          options: ["a) base", "b) self", "c) this", "d) super"],
+          correct: "c",
+          explanation:
+            "The `this` pointer, which holds the address of the object on which the member function was called, is implicitly passed as a hidden argument.",
+        },
+        {
+          part: 3,
+          question: "Q150. Which is true about destructors?",
+          options: [
+            "a) They take arguments",
+            "b) They can be overloaded",
+            "c) Only one destructor per class",
+            "d) They must be private",
+          ],
+          correct: "c",
+          explanation:
+            "A class can have only one destructor. It cannot be overloaded and cannot take parameters.",
+        },
+
+        // Part 4: Q151-200
+        {
+          part: 4,
+          question: "Q151. Output?",
+          code: 'int a=10;\ncout << a++ << " " << ++a;',
+          options: ["a) 10 11", "b) 10 12", "c) 11 12", "d) 12 12"],
+          correct: "b",
+          explanation:
+            "The order of evaluation for function arguments is unspecified, leading to undefined behavior. On many compilers, it might evaluate `++a` first (a becomes 11), then evaluate `a++` (uses 11, then a becomes 12), and print '10 12', but this is not guaranteed.",
+        },
+        {
+          part: 4,
+          question: "Q152. Predict output:",
+          code: 'int x=0;\nif(x=5)\n    cout << "Yes";\nelse\n    cout << "No";',
+          options: ["a) Yes", "b) No", "c) Error", "d) Garbage"],
+          correct: "a",
+          explanation:
+            "The expression `x=5` is an assignment, not a comparison. The value of an assignment is the value assigned, which is 5. Since 5 is non-zero, it evaluates to `true`, and 'Yes' is printed.",
+        },
+        {
+          part: 4,
+          question: "Q153. Output?",
+          code: "int a=5;\ncout << (a==5);",
+          options: ["a) 0", "b) 1", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The comparison `a==5` is true. In C++, the boolean value `true` is converted to the integer 1 when printed to the output stream.",
+        },
+        {
+          part: 4,
+          question: "Q154. Result?",
+          code: "void f(int x=10) {\n    cout << x;\n}\nint main() {\n    f();\n}",
+          options: ["a) 0", "b) 10", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The function `f` has a default argument for `x`. Since no argument is provided in the call `f()`, the default value of 10 is used and printed.",
+        },
+        {
+          part: 4,
+          question: "Q155. Output?",
+          code: 'class A {\npublic:\n    A() { cout << "A"; }\n};\nint main() {\n    A a[2];\n}',
+          options: ["a) A", "b) AA", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "An array of 2 `A` objects is created. The default constructor is called for each element of the array, so 'A' is printed twice.",
+        },
+        {
+          part: 4,
+          question: "Q156. Predict output:",
+          code: 'class A {\npublic:\n    A() { cout << "C"; }\n    ~A() { cout << "D"; }\n};\nint main() {\n    A obj;\n}',
+          options: ["a) C", "b) D", "c) CD", "d) DC"],
+          correct: "c",
+          explanation:
+            "The constructor runs when `obj` is created, printing 'C'. The destructor runs when `obj` goes out of scope at the end of `main`, printing 'D'.",
+        },
+        {
+          part: 4,
+          question: "Q157. Output of program:",
+          code: 'class A {\npublic:\n    virtual void f() { cout << "A"; }\n};\nclass B : public A {\npublic:\n    void f() { cout << "B"; }\n};\nint main() {\n    B obj;\n    obj.f();\n}',
+          options: ["a) A", "b) B", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The object `obj` is of type `B`. The call `obj.f()` directly invokes the `f()` method of class `B`. The `virtual` keyword is irrelevant here as we are not using base class pointers.",
+        },
+        {
+          part: 4,
+          question: "Q158. Output?",
+          code: 'class Base {\npublic:\n    void show() { cout << "Base"; }\n};\nclass Derived: public Base {\npublic:\n    void show() { cout << "Derived"; }\n};\nint main() {\n    Derived d;\n    d.show();\n}',
+          options: ["a) Base", "b) Derived", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The object `d` is of type `Derived`. The call `d.show()` invokes the `show` method defined in the `Derived` class, printing 'Derived'. This is method hiding, not polymorphism.",
+        },
+        {
+          part: 4,
+          question: "Q159. Predict output:",
+          code: 'try {\n    throw 5;\n} catch (double e) {\n    cout << "double";\n} catch (int e) {\n    cout << "int";\n}',
+          options: ["a) int", "b) double", "c) Error", "d) Nothing"],
+          correct: "a",
+          explanation:
+            "An integer `5` is thrown. The `catch` blocks are checked in order. The first one for `double` does not match. The second one for `int` matches, so 'int' is printed.",
+        },
+        {
+          part: 4,
+          question: "Q160. Output?",
+          code: "int arr[5] = {1,2,3,4,5};\ncout << arr[2];",
+          options: ["a) 1", "b) 2", "c) 3", "d) Error"],
+          correct: "c",
+          explanation:
+            "Array indexing is zero-based. `arr[0]` is 1, `arr[1]` is 2, and `arr[2]` is the third element, which is 3.",
+        },
+        {
+          part: 4,
+          question: "Q161. Predict output:",
+          code: 'cout << sizeof(double) << " " << sizeof(long long);',
+          options: ["a) 4 4", "b) 8 8", "c) 4 8", "d) 8 4"],
+          correct: "b",
+          explanation:
+            "On most modern 64-bit systems, a `double` is 8 bytes and a `long long` is also 8 bytes.",
+        },
+        {
+          part: 4,
+          question: "Q162. Output?",
+          code: 'string s="CDAC";\ncout << s.at(2);',
+          options: ["a) A", "b) C", "c) D", "d) Error"],
+          correct: "a",
+          explanation:
+            "The `.at()` function provides bounds-checked access. `s.at(2)` accesses the character at index 2 (the third character), which is 'A'.",
+        },
+        {
+          part: 4,
+          question: "Q163. Predict output:",
+          code: "cout << (5>3 ? 10:20);",
+          options: ["a) 10", "b) 20", "c) Error", "d) Garbage"],
+          correct: "a",
+          explanation:
+            "The condition `5>3` is true, so the ternary operator evaluates to its first expression, which is 10.",
+        },
+        {
+          part: 4,
+          question: "Q164. Output?",
+          code: "int x=5;\nint &r=x;\nr++;\ncout << x;",
+          options: ["a) 5", "b) 6", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "`r` is a reference to `x`. Incrementing `r` also increments `x`. So, `x` becomes 6.",
+        },
+        {
+          part: 4,
+          question: "Q165. Result?",
+          code: "cout << (true && false);",
+          options: ["a) 0", "b) 1", "c) true", "d) false"],
+          correct: "a",
+          explanation:
+            "The logical AND of `true` and `false` is `false`. When printed, the boolean value `false` is converted to the integer 0.",
+        },
+        {
+          part: 4,
+          question: "Q166. Output?",
+          code: "int *p=nullptr;\ncout << (p==0);",
+          options: ["a) 0", "b) 1", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "`nullptr` is the modern C++ null pointer constant. It compares equal to 0. The comparison `p==0` is true, which prints as 1.",
+        },
+        {
+          part: 4,
+          question: "Q167. Predict output:",
+          code: "class Test {\npublic:\n    static int x;\n};\nint Test::x=5;\nint main() {\n    cout << Test::x;\n}",
+          options: ["a) 0", "b) 5", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "Static member `x` is accessed using the class name and scope resolution operator. It is initialized to 5, so 5 is printed.",
+        },
+        {
+          part: 4,
+          question: "Q168. Output?",
+          code: 'class A {\npublic:\n    virtual void f() { cout << "A"; }\n};\nclass B: public A {\npublic:\n    void f() { cout << "B"; }\n};\nint main() {\n    A* p=new B();\n    p->f();\n}',
+          options: ["a) A", "b) B", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "Since `f()` is virtual, the call is resolved at runtime. The pointer `p` points to a `B` object, so `B::f()` is called, printing 'B'.",
+        },
+        {
+          part: 4,
+          question: "Q169. Output?",
+          code: "for(int i=0;i<3;i++)\n    cout << i;",
+          options: ["a) 123", "b) 012", "c) 345", "d) Error"],
+          correct: "b",
+          explanation:
+            "The loop runs for `i` values of 0, 1, and 2. It terminates when `i` becomes 3. So, '012' is printed.",
+        },
+        {
+          part: 4,
+          question: "Q170. Predict output:",
+          code: "int x=5;\ndo {\n    cout << x--;\n} while(x>0);",
+          options: ["a) 54321", "b) 4321", "c) 12345", "d) Error"],
+          correct: "a",
+          explanation:
+            "The loop prints `x` and then decrements it. It runs for x=5, 4, 3, 2, 1. When x becomes 0, the condition `x>0` is false and the loop stops.",
+        },
+        {
+          part: 4,
+          question: "Q171. Output?",
+          code: "int i=0;\nwhile(i<3) {\n    cout << i++;\n}",
+          options: ["a) 123", "b) 012", "c) 345", "d) Error"],
+          correct: "b",
+          explanation:
+            "The loop runs for `i` values of 0, 1, and 2. Inside the loop, the current value of `i` is printed, and then `i` is incremented. The output is '012'.",
+        },
+        {
+          part: 4,
+          question: "Q172. Output?",
+          code: "char c='Z';\ncout << (int)c;",
+          options: ["a) 90", "b) 65", "c) Z", "d) Error"],
+          correct: "a",
+          explanation:
+            "Casting the character 'Z' to an integer prints its ASCII value, which is 90.",
+        },
+        {
+          part: 4,
+          question: "Q173. Predict output:",
+          code: "int a=10,b=20;\ncout << (a>b? a:b);",
+          options: ["a) 10", "b) 20", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The condition `a>b` (10>20) is false. The ternary operator evaluates to its second expression, `b`, which is 20.",
+        },
+        {
+          part: 4,
+          question: "Q174. Output?",
+          code: 'try {\n    throw "CDAC";\n} catch (const char* e) {\n    cout << e;\n}',
+          options: ["a) CDAC", "b) Error", "c) Nothing", "d) Garbage"],
+          correct: "a",
+          explanation:
+            'A string literal "CDAC" is thrown, which has the type `const char*`. The `catch` block correctly matches this type and prints the caught string.',
+        },
+        {
+          part: 4,
+          question: "Q175. Output?",
+          code: "cout << (4<<1);",
+          options: ["a) 2", "b) 4", "c) 8", "d) 16"],
+          correct: "c",
+          explanation:
+            "The `<<` operator is a bitwise left shift. Shifting the bits of 4 (binary 100) one position to the left results in 8 (binary 1000). It's equivalent to multiplying by 2.",
+        },
+        {
+          part: 4,
+          question: "Q176. Predict output:",
+          code: "int a=3,b=2;\ncout << a/b;",
+          options: ["a) 1", "b) 1.5", "c) 2", "d) Error"],
+          correct: "a",
+          explanation:
+            "Since both `a` and `b` are integers, integer division is performed. The result is 1, with the fractional part truncated.",
+        },
+        {
+          part: 4,
+          question: "Q177. Output?",
+          code: "double d=10/4.0;\ncout << d;",
+          options: ["a) 2.5", "b) 2", "c) 2.0", "d) Error"],
+          correct: "a",
+          explanation:
+            "Because one of the operands (`4.0`) is a double, floating-point division is performed. `10 / 4.0` results in 2.5, which is then assigned to `d`.",
+        },
+        {
+          part: 4,
+          question: "Q178. Predict output:",
+          code: "cout << (5|3);",
+          options: ["a) 1", "b) 7", "c) 8", "d) Error"],
+          correct: "b",
+          explanation:
+            "This is a bitwise OR operation. 5 in binary is 101, and 3 is 011. The bitwise OR (101 | 011) results in 111, which is 7 in decimal.",
+        },
+        {
+          part: 4,
+          question: "Q179. Output?",
+          code: 'int a=5;\ncout << (a==5? "Equal":"Not Equal");',
+          options: ["a) Equal", "b) Not Equal", "c) Error", "d) Garbage"],
+          correct: "a",
+          explanation:
+            'The condition `a==5` is true, so the ternary operator evaluates to its first value, the string "Equal".',
+        },
+        {
+          part: 4,
+          question: "Q180. Predict output:",
+          code: "cout << (5&&0);",
+          options: ["a) 0", "b) 1", "c) true", "d) false"],
+          correct: "a",
+          explanation:
+            "This is a logical AND. Since 5 is true but 0 is false, the result is `false`, which is printed as 0.",
+        },
+        {
+          part: 4,
+          question: "Q181. Output?",
+          code: 'int a=7;\ncout << (a%2==0? "Even":"Odd");',
+          options: ["a) Even", "b) Odd", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            'The remainder of 7 divided by 2 is 1. The condition `1==0` is false, so the ternary operator evaluates to its second value, "Odd".',
+        },
+        {
+          part: 4,
+          question: "Q182. Result?",
+          code: 'int a=2;\nswitch(a) {\n    case 1: cout << "One"; break;\n    case 2: cout << "Two"; break;\n    default: cout << "Other";\n}',
+          options: ["a) One", "b) Two", "c) Other", "d) Error"],
+          correct: "b",
+          explanation:
+            "The value of `a` is 2, which matches `case 2`. 'Two' is printed, and the `break` statement exits the switch.",
+        },
+        {
+          part: 4,
+          question: "Q183. Output?",
+          code: "int a=5;\nfor(int i=0;i<a;i+=2)\n    cout << i;",
+          options: ["a) 01234", "b) 024", "c) 135", "d) Error"],
+          correct: "b",
+          explanation:
+            "The loop starts at i=0 and increments by 2. It prints 0, then 2, then 4. When `i` becomes 6, the condition `i<5` is false and the loop terminates.",
+        },
+        {
+          part: 4,
+          question: "Q184. Predict output:",
+          code: "int arr[]={1,2,3};\ncout << arr[1];",
+          options: ["a) 1", "b) 2", "c) 3", "d) Error"],
+          correct: "b",
+          explanation:
+            "Array indexing is zero-based. `arr[1]` refers to the second element of the array, which is 2.",
+        },
+        {
+          part: 4,
+          question: "Q185. Output?",
+          code: 'string s="PGDAC";\ncout << s.substr(2,3);',
+          options: ["a) PGD", "b) DAC", "c) GDA", "d) Error"],
+          correct: "b",
+          explanation:
+            "`.substr(pos, len)` extracts a substring. Starting at index 2 ('D'), it extracts 3 characters, resulting in 'DAC'.",
+        },
+        {
+          part: 4,
+          question: "Q186. Result?",
+          code: "cout << (10==10);",
+          options: ["a) 0", "b) 1", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The condition `10==10` is true. The boolean value `true` is converted to the integer 1 for output.",
+        },
+        {
+          part: 4,
+          question: "Q187. Output?",
+          code: "int a=1;\nwhile(a<4) {\n    cout << a;\n    a++;\n}",
+          options: ["a) 1234", "b) 123", "c) 0123", "d) Error"],
+          correct: "b",
+          explanation:
+            "The loop prints `a` then increments it. It runs for a=1, 2, and 3. When `a` becomes 4, the condition `a<4` is false and the loop stops.",
+        },
+        {
+          part: 4,
+          question: "Q188. Predict output:",
+          code: "int a=8;\ncout << (a>>2);",
+          options: ["a) 2", "b) 4", "c) 8", "d) 16"],
+          correct: "a",
+          explanation:
+            "Bitwise right shift `>>2` shifts the bits of 8 (binary 1000) two places to the right, resulting in 2 (binary 10). It's equivalent to integer division by 4.",
+        },
+        {
+          part: 4,
+          question: "Q189. Output?",
+          code: "int a=3,b=4;\ncout << (a&b);",
+          options: ["a) 0", "b) 1", "c) 4", "d) Error"],
+          correct: "a",
+          explanation:
+            "This is a bitwise AND. 3 is 011 in binary, and 4 is 100. The bitwise AND (011 & 100) results in 000, which is 0.",
+        },
+        {
+          part: 4,
+          question: "Q190. Predict output:",
+          code: "cout << (true||false);",
+          options: ["a) 0", "b) 1", "c) true", "d) false"],
+          correct: "b",
+          explanation:
+            "The logical OR of `true` and `false` is `true`. When printed, `true` is converted to the integer 1.",
+        },
+        {
+          part: 4,
+          question: "Q191. Output?",
+          code: "int x=5;\ncout << (x+=2);",
+          options: ["a) 5", "b) 6", "c) 7", "d) Error"],
+          correct: "c",
+          explanation:
+            "`x+=2` is shorthand for `x = x + 2`. `x` becomes 7, and the value of the assignment expression is 7, which is printed.",
+        },
+        {
+          part: 4,
+          question: "Q192. Result?",
+          code: 'int a=2;\ncout << (a*3==6? "Yes":"No");',
+          options: ["a) Yes", "b) No", "c) Error", "d) Garbage"],
+          correct: "a",
+          explanation:
+            "The expression `a*3` evaluates to 6. The condition `6==6` is true, so the ternary operator returns 'Yes'.",
+        },
+        {
+          part: 4,
+          question: "Q193. Output?",
+          code: "int a=1;\ndo {\n    cout << a;\n    a++;\n} while(a<=3);",
+          options: ["a) 123", "b) 12", "c) 23", "d) Error"],
+          correct: "a",
+          explanation:
+            "The loop prints `a` and then increments it. It runs for a=1, 2, and 3. When `a` becomes 4, the condition `a<=3` is false and the loop terminates.",
+        },
+        {
+          part: 4,
+          question: "Q194. Predict output:",
+          code: "cout << (5*2-3/3);",
+          options: ["a) 9", "b) 10", "c) 8", "d) Error"],
+          correct: "a",
+          explanation:
+            "Due to operator precedence, multiplication and division are done first. `5*2` is 10, `3/3` is 1. The expression becomes `10 - 1`, which is 9.",
+        },
+        {
+          part: 4,
+          question: "Q195. Output?",
+          code: 'string s="Hello";\ncout << s[0];',
+          options: ["a) H", "b) e", "c) l", "d) Error"],
+          correct: "a",
+          explanation:
+            "String indexing is zero-based. `s[0]` accesses the first character of the string, which is 'H'.",
+        },
+        {
+          part: 4,
+          question: "Q196. Predict output:",
+          code: "int a=2;\ncout << (a==3? 100:200);",
+          options: ["a) 100", "b) 200", "c) Error", "d) Garbage"],
+          correct: "b",
+          explanation:
+            "The condition `a==3` (2==3) is false, so the ternary operator evaluates to its second expression, which is 200.",
+        },
+        {
+          part: 4,
+          question: "Q197. Output?",
+          code: "int x=5,y=2;\ncout << x%y;",
+          options: ["a) 1", "b) 2", "c) 3", "d) Error"],
+          correct: "a",
+          explanation:
+            "The modulus operator `%` returns the remainder of the integer division. The remainder of 5 divided by 2 is 1.",
+        },
+        {
+          part: 4,
+          question: "Q198. Predict output:",
+          code: "char c='A';\ncout << (c+1);",
+          options: ["a) A", "b) B", "c) 66", "d) Error"],
+          correct: "c",
+          explanation:
+            "When arithmetic is performed on a `char`, it is promoted to an `int`. The ASCII value of 'A' is 65. `65 + 1` is 66, which is printed.",
+        },
+        {
+          part: 4,
+          question: "Q199. Output?",
+          code: "int a=2,b=3;\ncout << (a<b? b-a: a-b);",
+          options: ["a) 1", "b) -1", "c) 2", "d) Error"],
+          correct: "a",
+          explanation:
+            "The condition `a<b` (2<3) is true. The ternary operator evaluates to its first expression, `b-a` (3-2), which is 1.",
+        },
+        {
+          part: 4,
+          question: "Q200. Predict output:",
+          code: "int a=2;\ncout << (a==2 && a<5);",
+          options: ["a) 0", "b) 1", "c) true", "d) false"],
+          correct: "b",
+          explanation:
+            "Both conditions are true: `a==2` is true and `a<5` is true. The logical AND of two true conditions is `true`, which is printed as 1.",
+        },
+      ];
+
+      // ---- TIMER LOGIC ----
+      function startTimer() {
+        let timeLeft = PART_DURATION_SECONDS;
+        const timerEl = document.getElementById("timer");
+
+        clearInterval(timerInterval); // Clear any existing timer
+
+        timerInterval = setInterval(() => {
+          timeLeft--;
+          const minutes = Math.floor(timeLeft / 60);
+          const seconds = timeLeft % 60;
+          timerEl.textContent = `${minutes}:${
+            seconds < 10 ? "0" : ""
+          }${seconds}`;
+
+          if (timeLeft <= 0) {
+            clearInterval(timerInterval);
+            timerEl.textContent = "Time's Up!";
+            // Auto-disable all options and show score
+            document
+              .querySelectorAll(".option")
+              .forEach((opt) => (opt.disabled = true));
+            document.getElementById("show-score-btn").style.display = "block";
+          }
+        }, 1000);
+      }
+
+      // ---- VIEW MANAGEMENT ----
+      function switchView(viewName) {
+        Object.values(allViews).forEach(
+          (view) => (view.style.display = "none")
+        );
+        if (allViews[viewName]) {
+          allViews[viewName].style.display = "block";
+        }
+      }
+
+      // ---- EVENT LISTENERS ----
+      document.getElementById("start-btn").addEventListener("click", () => {
+        const name = document.getElementById("name").value.trim();
+        const mobile = document.getElementById("mobile").value.trim();
+        const errorEl = document.getElementById("start-error");
+
+        if (name === "" || mobile === "") {
+          errorEl.textContent = "Please fill in both name and mobile number.";
+          errorEl.style.display = "block";
+          return;
+        }
+        if (!/^\d{10,}$/.test(mobile)) {
+          errorEl.textContent =
+            "Please enter a valid mobile number (at least 10 digits).";
+          errorEl.style.display = "block";
+          return;
+        }
+
+        errorEl.style.display = "none";
+        currentUser.name = name;
+        document.getElementById(
+          "welcome-message"
+        ).textContent = `Welcome, ${currentUser.name}!`;
+        switchView("parts");
+      });
+
+      document.querySelectorAll(".part-btn").forEach((button) => {
+        button.addEventListener("click", (e) => {
+          const partNum = parseInt(e.target.dataset.part, 10);
+          loadPart(partNum);
+        });
+      });
+
+      document
+        .getElementById("show-score-btn")
+        .addEventListener("click", showSummary);
+
+      document
+        .getElementById("back-to-parts-btn")
+        .addEventListener("click", () => {
+          switchView("parts");
+        });
+
+      // ---- QUIZ LOGIC ----
+      function loadPart(partNum) {
+        currentPartNumber = partNum;
+        currentPartData = quizData.filter((q) => q.part === partNum);
+        currentScore = 0;
+        answeredQuestions = 0;
+
+        document.getElementById("quiz-title").textContent = `Part ${partNum}`;
+        document.getElementById("show-score-btn").style.display = "none";
+
+        buildQuiz(currentPartData);
+        updateProgress();
+        startTimer();
+        switchView("quiz");
+      }
+
+      function buildQuiz(questions) {
+        const quizEl = document.getElementById("quiz");
+        quizEl.innerHTML = ""; // Clear previous questions
+
+        questions.forEach((data, index) => {
+          const questionBlock = document.createElement("div");
+          questionBlock.classList.add("question-block");
+
+          const questionText = document.createElement("p");
+          questionText.classList.add("question-text");
+          questionText.innerText = data.question;
+          questionBlock.appendChild(questionText);
+
+          if (data.code) {
+            const codeBlock = document.createElement("pre");
+            codeBlock.innerText = data.code;
+            questionBlock.appendChild(codeBlock);
+          }
+
+          const optionsContainer = document.createElement("div");
+          optionsContainer.classList.add("options-container");
+
+          data.options.forEach((optionText) => {
+            const optionButton = document.createElement("button");
+            optionButton.classList.add("option");
+            optionButton.innerText = optionText;
+            const optionLetter = optionText.charAt(0);
+
+            optionButton.addEventListener("click", () => {
+              checkAnswer(optionLetter, data.correct, index);
+            });
+
+            optionsContainer.appendChild(optionButton);
+          });
+
+          questionBlock.appendChild(optionsContainer);
+
+          const explanation = document.createElement("div");
+          explanation.classList.add("explanation");
+          explanation.innerText = data.explanation;
+          questionBlock.appendChild(explanation);
+
+          quizEl.appendChild(questionBlock);
+        });
+      }
+
+      function checkAnswer(selected, correct, questionIndex) {
+        const questionBlock =
+          document.getElementById("quiz").children[questionIndex];
+        const options = questionBlock.querySelectorAll(".option");
+        const explanation = questionBlock.querySelector(".explanation");
+
+        if (options[0].disabled) return;
+
+        if (selected === correct) {
+          currentScore++;
+        }
+
+        options.forEach((option) => {
+          const optionLetter = option.innerText.charAt(0);
+          if (optionLetter === selected) {
+            option.classList.add(
+              selected === correct ? "correct" : "incorrect"
+            );
+          }
+          if (optionLetter === correct) {
+            // Also highlight the correct answer if a wrong one was chosen
+            option.classList.add("correct");
+          }
+          option.disabled = true;
+        });
+
+        explanation.style.display = "block";
+        answeredQuestions++;
+        updateProgress();
+
+        if (answeredQuestions === currentPartData.length) {
+          document.getElementById("show-score-btn").style.display = "block";
+          clearInterval(timerInterval); // Stop timer when all questions are answered
+        }
+      }
+
+      function updateProgress() {
+        const percentage = (answeredQuestions / currentPartData.length) * 100;
+        document.getElementById("progress-bar").style.width = `${percentage}%`;
+        document.getElementById(
+          "progress-text"
+        ).textContent = `Answered: ${answeredQuestions} / ${currentPartData.length}`;
+      }
+
+      function showSummary() {
+        clearInterval(timerInterval); // Ensure timer is stopped
+        const percentage = (
+          (currentScore / currentPartData.length) *
+          100
+        ).toFixed(1);
+        const summaryTextEl = document.getElementById("summary-text");
+        summaryTextEl.innerHTML = `Hi ${currentUser.name}, your performance for <strong>Part ${currentPartNumber}</strong> is:<br><br>
+                                      <strong>Score:</strong> ${currentScore} out of ${currentPartData.length}<br>
+                                      <strong>Percentage:</strong> ${percentage}%`;
+
+        if (percentage >= 80) {
+          triggerConfetti();
+        }
+
+        switchView("summary");
+      }
+
+      function triggerConfetti() {
+        confetti({
+          particleCount: 150,
+          spread: 90,
+          origin: { y: 0.6 },
+        });
+      }
+    </script>
+  </body>
+</html>
